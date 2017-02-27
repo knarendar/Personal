@@ -1,0 +1,18 @@
+
+# Find EBS Volumes by using tags
+aws ec2 describe-volumes --region us-east-1 --filters Name=tag:app,Values=coffee | jq .Volumes[].VolumeId | sed 's/\"//g'
+aws ec2 describe-volumes --region us-east-1 --filters Name=tag:app,Values=smart | jq .Volumes[].VolumeId | sed 's/\"//g'
+
+# sync/download files from s3 bucket to local folder
+aws s3 sync s3://vzshellscripts /tmp/dbbackup
+
+# Find EBS volumes by instance#
+aws ec2 describe-volumes --region us-east-1 --filters Name=attachment.instance-id,Values=i-0ab1e5f11176cd028 | jq .Volumes[].VolumeId | sed 's/\"//g'
+
+# Find all the EBS Values with instance# declaratio
+instance_id=$(wget -q -O- http://169.254.169.254/latest/meta-data/instance-id)
+aws ec2 describe-volumes --region us-east-1 --filters Name=attachment.instance-id,Values=$instance_id | jq .Volumes[].VolumeId | sed 's/\"//g'
+
+# Jenkins Parametarized build using Tag, Values input
+aws ec2 describe-volumes --region us-east-1 --filters Name=tag:$tag,Values=$Values | jq .Volumes[].VolumeId | sed 's/\"//g']
+
