@@ -16,3 +16,9 @@ aws ec2 describe-volumes --region us-east-1 --filters Name=attachment.instance-i
 # Jenkins Parametarized build using Tag, Values input
 aws ec2 describe-volumes --region us-east-1 --filters Name=tag:$tag,Values=$Values | jq .Volumes[].VolumeId | sed 's/\"//g']
 
+# Find EBS Volume ID to linux device id:
+ec2-describe-instances `curl -s http://169.254.169.254/latest/meta-data/instance-id` | grep BLOCKDEVICE
+
+BLOCKDEVICE     /dev/sda1       vol-xxxxxxxx    2011-11-13T21:09:53.000Z
+BLOCKDEVICE     /dev/sdf        vol-xxxxxxxx    2011-11-13T21:09:53.000Z
+BLOCKDEVICE     /dev/sdg        vol-xxxxxxxx    2011-11-13T21:09:53.000Z
