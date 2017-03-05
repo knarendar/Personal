@@ -31,4 +31,13 @@ BLOCKDEVICE     /dev/sdg        vol-xxxxxxxx    2011-11-13T21:09:53.000Z
 export INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
 export INSTANCE_EBS_VOL=$(ec2-describe-instances $INSTANCE_ID | awk '/vol-*/ {print $3}')
 
+[ec2-user@ip-10-0-0-190 .aws]$ aws ec2  describe-volumes --filters  Name=attachment.instance-id,Values=$INSTANCE_ID --output text
+VOLUMES us-east-1b      2017-02-20T02:38:33.825Z        False   100     8       snap-037f1f9e6c8ea4d65  in-use  vol-0656f020483f8d1b5   
+gp2ATTACHMENTS     2017-02-20T02:38:33.000Z        True    /dev/xvda       i-0ab1e5f11176cd028     attached        vol-0656f020483f8d1b5TAGS    app     coffee
+
+VOLUMES us-east-1b      2017-02-21T01:05:43.495Z        False   150     50              in-use  vol-01788f600b9dd6bbb   
+gp2ATTACHMENTS 2017-02-21T01:06:26.000Z        False   /dev/sdf        i-0ab1e5f11176cd028     attached        vol-01788f600b9dd6bbbTAGS    app     coffee
+
+
+
 
