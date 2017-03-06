@@ -1,0 +1,48 @@
+# Find EBS Volumes by using tags
+aws ec2 describe-volumes --region us-east-1 --filters Name=tag:app,Values=coffee | jq .Volumes[].VolumeId | sed 's/\"//g'
+aws ec2 describe-volumes --region us-east-1 --filters Name=tag:app,Values=smart | jq .Volumes[].VolumeId | sed 's/\"//g'
+
+# sync/download files from s3 bucket to local folder
+aws s3 sync s3://vzshellscripts /tmp/dbbackup
+
+# Find EBS volumes by instance#
+aws ec2 describe-volumes --region us-east-1 --filters Name=attachment.instance-id,Values=i-0ab1e5f11176cd028 | jq .Volumes[].VolumeId | sed 's/\"//g'
+
+# Find all the EBS Values with instance# declaratio
+instance_id=$(wget -q -O- http://169.254.169.254/latest/meta-data/instance-id)
+aws ec2 describe-volumes --region us-east-1 --filters Name=attachment.instance-id,Values=$instance_id | jq .Volumes[].VolumeId | sed 's/\"//g'
+
+# Jenkins Parametarized build using Tag, Values input
+aws ec2 describe-volumes --region us-east-1 --filters Name=tag:$tag,Values=$Values | jq .Volumes[].VolumeId | sed 's/\"//g']
+
+## You can achieve the same thing from the CLI tools. Set the necessary environment variables:
+export EC2_PRIVATE_KEY=/root/pk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.pem 
+export EC2_CERT=/root/cert-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.pem
+
+# Find EBS Volume ID to linux device id:
+ec2-describe-instances `curl -s http://169.254.169.254/latest/meta-data/instance-id` | grep BLOCKDEVICE
+
+BLOCKDEVICE     /dev/sda1       vol-xxxxxxxx    2011-11-13T21:09:53.000Z
+BLOCKDEVICE     /dev/sdf        vol-xxxxxxxx    2011-11-13T21:09:53.000Z
+BLOCKDEVICE     /dev/sdg        vol-xxxxxxxx    2011-11-13T21:09:53.000Z
+
+## This will assign $INSTANCE_ID to your instance-id, and $INSTANCE_EBS_VOL to the volume name, which then you can use for other scripts.
+export INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
+export INSTANCE_EBS_VOL=$(ec2-describe-instances $INSTANCE_ID | awk '/vol-*/ {print $3}')
+
+[ec2-user@ip-10-0-0-190 .aws]$ aws ec2  describe-volumes --filters  Name=attachment.instance-id,Values=$INSTANCE_ID --output text
+VOLUMES us-east-1b      2017-02-20T02:38:33.825Z        False   100     8       snap-037f1f9e6c8ea4d65  in-use  vol-0656f020483f8d1b5   
+gp2ATTACHMENTS     2017-02-20T02:38:33.000Z        True    /dev/xvda       i-0ab1e5f11176cd028     attached        vol-0656f020483f8d1b5TAGS    app     coffee
+
+VOLUMES us-east-1b      2017-02-21T01:05:43.495Z        False   150     50              in-use  vol-01788f600b9dd6bbb   
+gp2ATTACHMENTS 2017-02-21T01:06:26.000Z        False   /dev/sdf        i-0ab1e5f11176cd028     attached        vol-01788f600b9dd6bbbTAGS    app     coffee
+
+
+[ec2-user@ip-10-0-0-190 ~]$ export AWS_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXX
+[ec2-user@ip-10-0-0-190 ~]$ export AWS_SECRET_KEY=xxxxxxxxxxxxxxxxxxxx
+
+[ec2-user@ip-10-0-0-190 ~]$ ec2-describe-instances i-0ab1e5f11176cd028RESERVATION     r-06fdce1d70a541084     700492648600INSTANCE        i-0ab1e5f11176cd028     ami-0b33d91d    ec2-54-198-164-86.compute-1.amazonaws.com       ip-10-0-0-190.ec2.internal      running oracle  0               t2.micro        2017-02-20T02:38:33+0000        us-east-1b          monitoring-disabled      54.198.164.86   10.0.0.190      vpc-101e6976    subnet-24d3817f ebs                             hvm     xen     reRJT1487558311927      sg-dc4a6ca0     default falseBLOCKDEVICE     /dev/xvda       vol-0656f020483f8d1b5   2017-02-20T02:38:33.000Z        trueBLOCKDEVICE     /dev/sdf        vol-01788f600b9dd6bbb   2017-02-21T01:06:26.000Z        falseNIC     eni-514e6395    subnet-24d3817f vpc-101e6976    700492648600    in-use  10.0.0.190      ip-10-0-0-190.ec2.internal      trueNICATTACHMENT   eni-attach-2c06cf7d     0       attached        2017-02-20T02:38:33+0000        trueNICASSOCIATION  54.198.164.86   amazon  10.0.0.190GROUP   sg-dc4a6ca0     launch-wizard-1PRIVATEIPADDRESS        10.0.0.190      ip-10-0-0-190.ec2.internal      ec2-54-198-164-86.compute-1.amazonaws.comTAG     instance        i-0ab1e5f11176cd028     Env     ProdTAG     instance        i-0ab1e5f11176cd028     Name    AppServer[ec2-user@ip-10-0-0-190 ~]$ ec2-describe-instances `curl -s http://169.254.169.254/latest/meta-data/instance-id` | grep BLOCKDEVICEBLOCKDEVICE     /dev/xvda       vol-0656f020483f8d1b5   2017-02-20T02:38:33.000Z        trueBLOCKDEVICE     /dev/sdf        vol-01788f600b9dd6bbb   2017-02-21T01:06:26.000Z        false[ec2-user@ip-10-0-0-190 ~]$
+
+http://docs.aws.amazon.com/cli/latest/userguide/controlling-output.html
+[ec2-user@ip-10-0-0-190 ~]$ aws ec2 describe-volumes --query 'Volumes[*].[VolumeId, Device, State, Attachments[0].InstanceId, AvailabilityZone, Size]'  --filters  Name=attachment.instance-id,Values=$INSTANCE_ID --output text
+vol-0656f020483f8d1b5   None    in-use  i-0ab1e5f11176cd028     us-east-1b      8vol-01788f600b9dd6bbb   None    in-use  i-0ab1e5f11176cd028     us-east-1b      50
