@@ -1,0 +1,11 @@
+Arrays:
+  del
+  append
+  len
+  max
+  min
+  count
+  
+  shopppinglist= "eggs, carrots, milk, cherries, apples"
+  shoppinglists2= ["eggs", "carrots", "milk", "cherries", "apples"]
+  
