@@ -46,3 +46,10 @@ gp2ATTACHMENTS 2017-02-21T01:06:26.000Z        False   /dev/sdf        i-0ab1e5f
 http://docs.aws.amazon.com/cli/latest/userguide/controlling-output.html
 [ec2-user@ip-10-0-0-190 ~]$ aws ec2 describe-volumes --query 'Volumes[*].[VolumeId, Device, State, Attachments[0].InstanceId, AvailabilityZone, Size]'  --filters  Name=attachment.instance-id,Values=$INSTANCE_ID --output text
 vol-0656f020483f8d1b5   None    in-use  i-0ab1e5f11176cd028     us-east-1b      8vol-01788f600b9dd6bbb   None    in-use  i-0ab1e5f11176cd028     us-east-1b      50
+
+#### To find the snapshot id date and time
+[ec2-user@ip-10-0-0-190 ~]$ aws ec2 describe-snapshots --owner-ids 700492648600 --query 'Snapshots[*].{Time:StartTime}' --output text |cut -c 1-10,12-19 --output-delimiter=' '
+2017-03-06 18:26:26
+2017-03-14 19:02:46
+2017-03-14 19:02:45
+2017-03-14 18:53:39
