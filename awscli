@@ -53,3 +53,8 @@ vol-0656f020483f8d1b5   None    in-use  i-0ab1e5f11176cd028     us-east-1b      
 2017-03-14 19:02:46
 2017-03-14 19:02:45
 2017-03-14 18:53:39
+
+### to find device partition
+[z776665@ip-10-74-25-240 ~]$ lsblk |grep part |awk '{print $1 " " $6}' |grep xvda
+├─xvda1 part
+└─xvda2 part
